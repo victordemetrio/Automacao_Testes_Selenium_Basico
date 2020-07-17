@@ -9,7 +9,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.lang.annotation.Documented;
 import java.util.concurrent.TimeUnit;
@@ -24,10 +27,8 @@ public class informacoesUsuarioTest {
         System.setProperty("webdriver.chrome.driver","C:\\Users\\Victor Hugo\\IdeaProjects\\DrivesProgramacao\\chromedriver.exe");
         navegador = new ChromeDriver();
         //navegador.manage().window().maximize(); maximizar navegado
-        navegador.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);//tempo de espera para a execuçao dos comandos
-    }
-    @Test
-    public void testAdicionarUmaInformacaoAdicionaoDoUsuario(){
+        navegador.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);//[Espera Implicita]tempo de espera para a execuçao dos comandos
+
         navegador.get("http://www.juliodelima.com.br/taskit/");
         navegador.findElement(By.linkText("Sign in")).click();
         WebElement formlinkSigniInbox = navegador.findElement(By.id("signinbox"));
@@ -39,6 +40,48 @@ public class informacoesUsuarioTest {
         navegador.findElement(By.className("me")).click();
         //clicar em um link que possui o texto "MORE DATA ABOUT YOU"
         navegador.findElement(By.linkText("MORE DATA ABOUT YOU")).click();
+    }
+    @Test
+    public void testRemoverUmContadoDeUsuario(){
+        /*! @Before
+        logar-se na aplicaçao
+        clicar no menu Hi, Julio
+        ir para a aba Add more data
+        */
+        //+558366665555  //span[text()="+558366665555"]/following-sibling::a
+        //clicar no elemento de explusao pelo  xpath
+        navegador.findElement(By.xpath("//span[text()=\"+558366665555\"]/following-sibling::a")).click();
+        //confirmar a janela javaScript
+        navegador.switchTo().alert().accept();
+
+        // validar que a mensagem apresentada foi "Rest in peace, dear phone!"
+        WebElement msgPopValidacaoTstRemovCtctUser = navegador.findElement(By.id("toast-container"));
+        assertEquals("Rest in peace, dear phone!",msgPopValidacaoTstRemovCtctUser.getText());
+
+        //aguardar ate 10 segundos para que a janela desapareça
+        WebDriverWait aguardar = new WebDriverWait(navegador,10);
+        aguardar.until(ExpectedConditions.stalenessOf(msgPopValidacaoTstRemovCtctUser));
+        /*!
+        * As estratégias mais utilizadas são:
+
+        alertIsPresent()  Aguarda até que uma mensagem Javascript seja apresentada.
+
+        elementToBeClickable(By localizador) Aguarda até que um elemento esteja pronto para receber um clique, por exemplo, ele poderia ficar desabilitado durante algum período e então teríamos de esperar até que ficasse habilitado novamente.
+
+        visibilityOfElementLocated(By localizador) Aguarda até que as propriedades CSS display e hidden possuam valores que possibilitam a visualização do elemento pelo usuário.
+        * */
+        //clicar no link com texto "Logout"
+        navegador.findElement(By.linkText("Logout")).click();
+
+    }
+
+    //@Test
+    public void testAdicionarUmaInformacaoAdicionaoDoUsuario(){
+        /*! @Before
+        logar-se na aplicaçao
+        clicar no menu Hi, Julio
+        ir para a aba Add more data
+        */
         //clicar em um button que possui o texto "+ ADD MORE DATA" atravez do xphaf //*[@id="moredata"]/div[2]/button
         navegador.findElement(By.xpath("//*[@id=\"moredata\"]/div[2]/button")).click();
         //identificar a popup onde esta o formulario de id ADD MORE DATA
@@ -57,8 +100,8 @@ public class informacoesUsuarioTest {
         //String mensagemValidacao = mensagemPopValidacao.getText();
         //assertEquals("Your contact has been added!",mensagemValidacao);
     }
-    /*!
-    @Test
+
+   // @Test
     public void testValidacaoLoginDoUsuario(){
         //navegando para pagina do teste
         navegador.get("http://www.juliodelima.com.br/taskit/");
@@ -81,7 +124,7 @@ public class informacoesUsuarioTest {
         String textNoElementoMe = me.getText();
         assertEquals("Hi, Julio",textNoElementoMe);
     }
-    */
+
     @After
     public void tearDown(){
         //fechar o navegador
