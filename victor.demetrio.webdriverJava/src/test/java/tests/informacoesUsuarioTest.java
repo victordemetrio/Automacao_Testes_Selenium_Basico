@@ -2,11 +2,15 @@ package tests;
 
 import static org.junit.Assert.*;
 
+import org.easetech.easytest.annotation.DataLoader;
+import org.easetech.easytest.annotation.Param;
+import org.easetech.easytest.runner.DataDrivenTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,11 +21,12 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import suporte.Generator;
 import suporte.Screenshot;
-
 import java.lang.annotation.Documented;
 import java.util.concurrent.TimeUnit;
 
-//<!--Automação de Testes com Selenium WebDriver em Java Aula 06 e 07-->
+@RunWith(DataDrivenTestRunner.class)
+@DataLoader(filePaths = "InformacoesUsuarioTest.csv")
+//<!--Automação de Testes com Selenium WebDriver em Java -->
 public class informacoesUsuarioTest {
     private WebDriver navegador;
 
@@ -48,7 +53,8 @@ public class informacoesUsuarioTest {
         //clicar em um link que possui o texto "MORE DATA ABOUT YOU"
         navegador.findElement(By.linkText("MORE DATA ABOUT YOU")).click();
     }
-    @Test
+
+    //@Test
     public void testRemoverUmContadoDeUsuario(){
         navegador.findElement(By.xpath("//span[text()=\"+558366665555\"]/following-sibling::a")).click();
 
@@ -56,13 +62,13 @@ public class informacoesUsuarioTest {
 
         WebElement msgPopValidacaoTstRemovCtctUser = navegador.findElement(By.id("toast-container"));
         assertEquals("Rest in peace, dear phone!",msgPopValidacaoTstRemovCtctUser.getText());
-        /*!
-        nao funcionando o metodo "tirarScreenshot"
+
+        //nao funcionando o metodo "tirarScreenshot"
         String screenshotArquivo  = "C:\\Users\\Victor Hugo\\IdeaProjects\\victor.demetrio.webdriverJava\\src\\test\\java\\screenshot"
                 + Generator.dataHoraParaArquivo()
                 + nomeDoTeste.getMethodName() + ".png";
         Screenshot.tirarScreenshot(navegador,screenshotArquivo);
-        */
+        //--------------------------------------------------------
         WebDriverWait aguardar = new WebDriverWait(navegador,10);
         aguardar.until(ExpectedConditions.stalenessOf(msgPopValidacaoTstRemovCtctUser));
 
@@ -100,8 +106,12 @@ public class informacoesUsuarioTest {
         */
     }
 
-    //@Test
-    public void testAdicionarUmaInformacaoAdicionaoDoUsuario(){
+    @Test
+    public void testAdicionarUmaInformacaoAdicionaoDoUsuario(
+            @Param(name = "tipo")String tipo,
+             @Param(name = "contato")String contato,
+             @Param(name = "mensagem")String mensagemEsperada
+    ){
         /*! @Before
         logar-se na aplicaçao
         clicar no menu Hi, Julio
@@ -114,14 +124,14 @@ public class informacoesUsuarioTest {
         WebElement popupAddMoreData = navegador.findElement(By.id("addmoredata"));
         //no comboBox de name "type" escolher a opçao "phone"
         WebElement canpoTypePhone = popupAddMoreData.findElement(By.name("type"));
-        new Select(canpoTypePhone).selectByVisibleText("Phone");
+        new Select(canpoTypePhone).selectByVisibleText(tipo);
         //no campo de name "contact" digitar "+558399991111"
-        popupAddMoreData.findElement(By.name("contact")).sendKeys("+558399991111");
+        popupAddMoreData.findElement(By.name("contact")).sendKeys(contato);
         //clicar no link que possui o texto "SAVE"que esta na popup
         popupAddMoreData.findElement(By.linkText("SAVE")).click();
         //no mensagem de id "toast-container" validar que o texto é "Your contact has been added!"
         WebElement mensagemPopValidacao = navegador.findElement(By.id("toast-container"));
-        assertEquals("Your contact has been added!",mensagemPopValidacao.getText());
+        assertEquals(mensagemEsperada,mensagemPopValidacao.getText());
         //String mensagemValidacao = mensagemPopValidacao.getText();
         //assertEquals("Your contact has been added!",mensagemValidacao);
     }
@@ -153,7 +163,7 @@ public class informacoesUsuarioTest {
     @After
     public void tearDown(){
         //fechar o navegador
-        //navegador.close();//fecha apenas a aba
+        navegador.close();//fecha apenas a aba
         //navegador.quit();//fecha o navegador
     }
 
